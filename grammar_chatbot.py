@@ -25,6 +25,18 @@ def correct_grammar(text):
 
     return text
 
+# ---------- Predefined responses ----------
+def get_predefined_response(user_input):
+    responses = {
+        "who are you": "I am a chatbot designed to help with grammar correction. How can I assist you today?",
+        "how are you": "I'm doing great, thanks for asking! How can I help you?",
+        "hello": "Hi there! How can I help you today?",
+        "bye": "Goodbye! Have a great day!",
+    }
+    
+    # Match lowercase user input with predefined responses
+    return responses.get(user_input.lower(), None)
+
 # ---------- Chat UI ----------
 def chat_ui():
     if "messages" not in st.session_state:
@@ -63,11 +75,19 @@ def chat_ui():
         submitted = st.form_submit_button("Send")
 
     if submitted and user_input.strip():
-        st.session_state.messages.append({"role": "user", "message": user_input})
-        corrected = correct_grammar(user_input)
-        st.session_state.messages.append(
-            {"role": "bot", "message": f"✅ Corrected: **{corrected}**"}
-        )
+        # First check if the input matches a predefined response
+        predefined_response = get_predefined_response(user_input)
+        
+        if predefined_response:
+            st.session_state.messages.append({"role": "user", "message": user_input})
+            st.session_state.messages.append({"role": "bot", "message": predefined_response})
+        else:
+            # Otherwise, perform grammar correction
+            st.session_state.messages.append({"role": "user", "message": user_input})
+            corrected = correct_grammar(user_input)
+            st.session_state.messages.append(
+                {"role": "bot", "message": f"✅ Corrected: **{corrected}**"}
+            )
 
     # Clear chat button
     if st.button("🗑️ Clear Chat"):
