@@ -27,13 +27,9 @@ def correct_grammar(text):
 
 # Chat UI
 def chat_ui():
-    # Init session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "input_submitted" not in st.session_state:
-        st.session_state.input_submitted = False
 
-    # Show chat history
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.markdown(f'''
@@ -52,11 +48,10 @@ def chat_ui():
                 </div>
             ''', unsafe_allow_html=True)
 
-    # Input form — handles input safely
     with st.form("chat_form", clear_on_submit=True):
         user_input = st.text_input("💬 Type your sentence")
         submitted = st.form_submit_button("Send")
-    
+
     if submitted and user_input.strip():
         st.session_state.messages.append({"role": "user", "message": user_input})
         corrected = correct_grammar(user_input)
@@ -64,7 +59,7 @@ def chat_ui():
             "role": "bot",
             "message": f"✅ Here's the corrected version:\n\n**{corrected}**"
         })
-        st.experimental_rerun()
+        # ❌ No more experimental_rerun()
 
 # Main
 def main():
