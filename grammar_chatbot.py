@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# ✅ Function to correct grammar using LanguageTool API
+# ✅ Grammar correction using LanguageTool API
 def correct_grammar(text):
     url = "https://api.languagetool.org/v2/check"
     params = {
@@ -19,25 +19,20 @@ def correct_grammar(text):
             replacement = match["replacements"][0]["value"]
             corrections.append((offset, length, replacement))
 
-    # Sort by offset in reverse to avoid messing up string indices
     corrections.sort(reverse=True)
-
-    corrected_text = text
     for offset, length, replacement in corrections:
-        corrected_text = corrected_text[:offset] + replacement + corrected_text[offset + length:]
+        text = text[:offset] + replacement + text[offset + length:]
 
-    return corrected_text
+    return text
 
-# ✅ Chat UI with WhatsApp-style bubbles
+# ✅ Chat UI function
 def chat_ui():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    if "user_input" not in st.session_state:
-        st.session_state.user_input = ""
-
-    if len(st.session_state.messages) == 0:
-        st.session_state.messages.append({"role": "bot", "message": "👋 Hello! Type a sentence and I’ll correct its grammar."})
+    # Set initial input if not set
+    if "temp_input" not in st.session_state:
+        st.session_state.temp_input = ""
 
     # Display chat history
     for msg in st.session_state.messages:
@@ -58,26 +53,23 @@ def chat_ui():
                 </div>
             ''', unsafe_allow_html=True)
 
-    # Input box
-    user_input = st.text_input("💬 Type your sentence here", key="user_input")
+    # Text input
+    user_input = st.text_input("💬 Type your sentence here", key="temp_input")
 
     if user_input:
-        # Add user's message
+        # Add user message
         st.session_state.messages.append({"role": "user", "message": user_input})
 
-        # Get corrected text
+        # Get and add bot response
         corrected = correct_grammar(user_input)
-
-        # Add bot's response
         st.session_state.messages.append({"role": "bot", "message": f"✅ Here's the corrected version:\n\n**{corrected}**"})
 
-        # Clear input
-        st.session_state.user_input = ""
+        # Clear the input by resetting before re-render
+        st.session_state.temp_input = ""
 
-        # Trigger rerun to update UI
         st.experimental_rerun()
 
-# ✅ Main app function
+# ✅ Main function
 def main():
     st.set_page_config(page_title="Grammar Chatbot", layout="centered")
     st.title("📝 Grammar Correction Chatbot")
