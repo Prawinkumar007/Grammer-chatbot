@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# ✅ Grammar correction using LanguageTool API
+# Grammar correction using LanguageTool API
 def correct_grammar(text):
     url = "https://api.languagetool.org/v2/check"
     params = {
@@ -25,16 +25,15 @@ def correct_grammar(text):
 
     return text
 
-# ✅ Chat UI function
+# Chat UI
 def chat_ui():
+    # Init session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "input_submitted" not in st.session_state:
+        st.session_state.input_submitted = False
 
-    # Set initial input if not set
-    if "temp_input" not in st.session_state:
-        st.session_state.temp_input = ""
-
-    # Display chat history
+    # Show chat history
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.markdown(f'''
@@ -53,23 +52,21 @@ def chat_ui():
                 </div>
             ''', unsafe_allow_html=True)
 
-    # Text input
-    user_input = st.text_input("💬 Type your sentence here", key="temp_input")
-
-    if user_input:
-        # Add user message
+    # Input form — handles input safely
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("💬 Type your sentence")
+        submitted = st.form_submit_button("Send")
+    
+    if submitted and user_input.strip():
         st.session_state.messages.append({"role": "user", "message": user_input})
-
-        # Get and add bot response
         corrected = correct_grammar(user_input)
-        st.session_state.messages.append({"role": "bot", "message": f"✅ Here's the corrected version:\n\n**{corrected}**"})
-
-        # Clear the input by resetting before re-render
-        st.session_state.temp_input = ""
-
+        st.session_state.messages.append({
+            "role": "bot",
+            "message": f"✅ Here's the corrected version:\n\n**{corrected}**"
+        })
         st.experimental_rerun()
 
-# ✅ Main function
+# Main
 def main():
     st.set_page_config(page_title="Grammar Chatbot", layout="centered")
     st.title("📝 Grammar Correction Chatbot")
