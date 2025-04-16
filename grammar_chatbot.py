@@ -49,9 +49,6 @@ def chat_ui():
         # Show bot response
         st.session_state.messages.append({"role": "bot", "message": f"Here's the corrected text: {corrected_text}"})
 
-        # Refresh the page to show the latest messages
-        st.experimental_rerun()
-
 # Streamlit app
 def main():
     st.title("WhatsApp-style Grammar Correction Chatbot")
