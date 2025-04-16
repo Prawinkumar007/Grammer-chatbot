@@ -33,9 +33,9 @@ def get_predefined_response(user_input):
         "hello": "Hi there! How can I help you today?",
         "bye": "Goodbye! Have a great day!",
     }
-    
+
     # Match lowercase user input with predefined responses
-    return responses.get(user_input.lower(), None)
+    return responses.get(user_input.strip().lower(), None)
 
 # ---------- Chat UI ----------
 def chat_ui():
